@@ -26,7 +26,7 @@ This will start the server and listen for incoming webhook events from the LINE 
 Deploying
 You can deploy this application to a cloud provider that supports Go, such as Google Cloud Functions or Heroku. Ensure that you configure the environment variables correctly in your deployment setup.
 ## demo
-waiting (Line's new API diplay a loading animation)  
+waiting   
 ![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/91678d33-fd89-492e-b58b-f18e12bfdd06)  
 text response  
 ![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/2e7fe70c-8a75-4913-b1b5-9800d9a863ef)  
