@@ -26,12 +26,12 @@ This will start the server and listen for incoming webhook events from the LINE 
 Deploying
 You can deploy this application to a cloud provider that supports Go, such as Google Cloud Functions or Heroku. Ensure that you configure the environment variables correctly in your deployment setup.
 ## demo
-waiting (new function in Line to diplay a loading animation)
-![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/91678d33-fd89-492e-b58b-f18e12bfdd06)
-text response
-![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/2e7fe70c-8a75-4913-b1b5-9800d9a863ef)
-image response
-![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/7bcf9aaf-10a7-481f-9712-c4eb81640856)
+waiting (new function in Line to diplay a loading animation)  
+![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/91678d33-fd89-492e-b58b-f18e12bfdd06)  
+text response  
+![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/2e7fe70c-8a75-4913-b1b5-9800d9a863ef)  
+image response  
+![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/7bcf9aaf-10a7-481f-9712-c4eb81640856)  
 Translation of the text in the image: 
 This image depicts a European Goldfinch (scientific name: Carduelis carduelis).   
 They are a species of songbird in the finch family, native to Europe, North Africa, and Central Asia.  
