@@ -10,21 +10,24 @@ Google Cloud account and access to the Generative AI models
 LINE Developer account and access to Messaging API  
 ## Installation
 Clone the repository:
+
 Copy code  
 ```git clone https://github.com/Rayui1225/go-line-bot.git```  
 ```cd go-line-bot```  
+
 Set up environment variables:You need to set the following environment variables:  
 GOOGLE_GEMINI_API_KEY: Your API key for Google Cloud services.  
 ACCESS_TOKEN: Your LINE Messaging API access token.  
 CHANNEL_SECRET: Your LINE Messaging API channel secret.  
-You can set these variables in your environment or use a .env file and load it with a package like godotenv.  
-##Usage
-To run the application, use:
-```go run main.go```
-This will start the server and listen for incoming webhook events from the LINE platform.
 
-Deploying
-You can deploy this application to a cloud provider that supports Go, such as Google Cloud Functions or Heroku. Ensure that you configure the environment variables correctly in your deployment setup.
+You can set these variables in your environment or use a .env file and load it with a package like godotenv.  
+##Usage  
+To run the application, use:  
+```go run main.go```  
+This will start the server and listen for incoming webhook events from the LINE platform.  
+
+Deploying  
+You can deploy this application to a cloud provider that supports Go, such as Google Cloud Functions or Heroku. Ensure that you configure the environment variables correctly in your deployment setup.  
 ## demo
 waiting   
 ![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/91678d33-fd89-492e-b58b-f18e12bfdd06)  
