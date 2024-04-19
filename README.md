@@ -12,8 +12,12 @@ LINE Developer account and access to Messaging API
 Clone the repository:
 
 Copy code  
-```git clone https://github.com/Rayui1225/go-line-bot.git```  
-```cd go-line-bot```  
+```
+git clone https://github.com/Rayui1225/go-line-bot.git
+```  
+```
+cd go-line-bot
+```  
 
 Set up environment variables:You need to set the following environment variables:  
 GOOGLE_GEMINI_API_KEY: Your API key for Google Cloud services.  
@@ -23,7 +27,9 @@ CHANNEL_SECRET: Your LINE Messaging API channel secret.
 You can set these variables in your environment or use a .env file and load it with a package like godotenv.  
 ##Usage  
 To run the application, use:  
-```go run main.go```  
+```
+go run main.go
+```  
 This will start the server and listen for incoming webhook events from the LINE platform.  
 
 Deploying  
