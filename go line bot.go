@@ -9,6 +9,7 @@ import (
     "fmt"
     "github.com/google/generative-ai-go/genai"
     "google.golang.org/api/option"
+    "bytes"
 )
 
 func main() {
@@ -17,9 +18,11 @@ func main() {
 }
 
 func callbackHandler(w http.ResponseWriter, req *http.Request){
+    secretKey := "channel secret key"
+    accessToken := "access token"
     bot, err := linebot.New(
-        //channel secret key, 
-        //access token, 
+        secretKey, //channel secret key
+        accessToken, //access token
     )
     if err != nil {
         log.Fatal(err)
@@ -33,8 +36,26 @@ func callbackHandler(w http.ResponseWriter, req *http.Request){
         }
         return
     }
+    done := make(chan error)
     for _, event := range events {
         if event.Type == linebot.EventTypeMessage {
+            var chatId string
+            switch event.Source.Type {
+            case linebot.EventSourceTypeUser:
+                chatId = event.Source.UserID
+            case linebot.EventSourceTypeGroup:
+                chatId = event.Source.GroupID
+            case linebot.EventSourceTypeRoom:
+                chatId = event.Source.RoomID
+            }
+            go sendLoadingAnimation(chatId, accessToken,done)
+            go func(){
+                if err := <-done; err != nil {
+                    log.Fatalf("Failed to send loading animation: %v", err)
+                } else {
+                    log.Println("Loading animation sent successfully")
+                }
+            }()
             switch message := event.Message.(type) {
             case *linebot.TextMessage:
                 replyMessage ,err:=  replyText(message.Text)
@@ -85,7 +106,7 @@ func printResponse(resp *genai.GenerateContentResponse) string {
 func replyText(s string) (string,error) {
 ctx := context.Background()
 // Access your API key as an environment variable (see "Set up your API key" above)
-client, err := genai.NewClient(ctx, option.WithAPIKey("your Gemini API"))
+client, err := genai.NewClient(ctx, option.WithAPIKey("your API key"))
 if err != nil {
   return "" , err
 }
@@ -103,7 +124,7 @@ return printResponse(resp) , nil
 func replyImage(ImageData []byte) (string,error){
     ctx := context.Background()
 // Access your API key as an environment variable (see "Set up your API key" above)
-client, err := genai.NewClient(ctx, option.WithAPIKey("your Gemini API"))
+client, err := genai.NewClient(ctx, option.WithAPIKey("your API key"))
 if err != nil {
     return "" , err
 }
@@ -122,3 +143,34 @@ model := client.GenerativeModel("gemini-pro-vision")
 	}
 return printResponse(resp),nil
 }
+
+func sendLoadingAnimation(chatId string, channelToken string, done chan<- error) {
+    url := "https://api.line.me/v2/bot/chat/loading/start"
+    requestBody := fmt.Sprintf(`{"chatId":"%s","loadingSeconds":60}`, chatId)
+    req, err := http.NewRequest("POST", url, bytes.NewBufferString(requestBody))
+    if err != nil {
+        done <- err
+        return
+    }
+    req.Header.Set("Content-Type", "application/json")
+    req.Header.Set("Authorization", "Bearer " + channelToken)
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        done <- err
+        return
+    }
+    defer resp.Body.Close()
+
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        done <- err
+        return
+    }
+
+    fmt.Println("Response Status:", resp.Status)
+    fmt.Println("Response Body:", string(body))
+    done <- nil
+}
+
