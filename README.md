@@ -39,7 +39,7 @@ waiting
 ![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/91678d33-fd89-492e-b58b-f18e12bfdd06)  
 text response  
 ![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/2e7fe70c-8a75-4913-b1b5-9800d9a863ef)  
-image response  
+image response(defualt prompt:Describe this image with scientific detail, reply in zh-TW)  
 ![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/7bcf9aaf-10a7-481f-9712-c4eb81640856)  
 Translation of the text in the image: 
 This image depicts a European Goldfinch (scientific name: Carduelis carduelis).   
