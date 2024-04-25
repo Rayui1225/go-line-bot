@@ -10,16 +10,21 @@ import (
     "github.com/google/generative-ai-go/genai"
     "google.golang.org/api/option"
     "bytes"
+    firebase "firebase.google.com/go/v4"
 )
 
+type GeminiChat struct {
+    Parts []string `json:"parts"`
+    Role  string   `json:"role"`
+}
 func main() {
     http.HandleFunc("/callback", callbackHandler)
     log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func callbackHandler(w http.ResponseWriter, req *http.Request){
-    secretKey := "channel secret key"
-    accessToken := "access token"
+    secretKey := "secretKey"
+    accessToken := "accessToken"
     bot, err := linebot.New(
         secretKey, //channel secret key
         accessToken, //access token
@@ -58,7 +63,7 @@ func callbackHandler(w http.ResponseWriter, req *http.Request){
             }()
             switch message := event.Message.(type) {
             case *linebot.TextMessage:
-                replyMessage ,err:=  replyText(message.Text)
+                replyMessage ,err:=  replyText(message.Text,chatId)
                 if err != nil {
                     log.Printf("Error generating reply: %v", err)
                     replyMessage = "Sorry, I encountered an error."
@@ -103,22 +108,40 @@ func printResponse(resp *genai.GenerateContentResponse) string {
 	return ret 
 }
 
-func replyText(s string) (string,error) {
+func replyText(s string,id string) (string,error) {
 ctx := context.Background()
 // Access your API key as an environment variable (see "Set up your API key" above)
 client, err := genai.NewClient(ctx, option.WithAPIKey("your API key"))
 if err != nil {
-  return "" , err
+    return "" , err
 }
 defer client.Close()
-
+var Memory []*genai.Content
+history ,err := getHistory(id)
+for _, c := range history {
+	parts := make([]genai.Part, len(c.Parts))
+		for i, part := range c.Parts {
+			parts[i] = genai.Text(part)
+		}
+		dst := &genai.Content{
+			Parts: parts,
+			Role:  c.Role,
+		}
+	Memory = append(Memory, dst)
+}
 model := client.GenerativeModel("gemini-pro")
-resp, err := model.GenerateContent(ctx, genai.Text(s))
+cs := model.StartChat()
+cs.History = Memory
+resp, err := cs.SendMessage(ctx, genai.Text(s))
 if err != nil {
     return "" , err
 }
-
-return printResponse(resp) , nil
+if err != nil {
+    log.Fatal(err)
+}
+text:=printResponse(resp)
+addToHistory(Memory, s,text,id)
+return text , nil
 }
 
 func replyImage(ImageData []byte) (string,error){
@@ -174,3 +197,62 @@ func sendLoadingAnimation(chatId string, channelToken string, done chan<- error)
     done <- nil
 }
 
+func getHistory(id string) ([]GeminiChat,error) {
+	ctx := context.Background()
+	conf := &firebase.Config{
+        DatabaseURL: "your CredentialsFile",  // \Realtime Database URL
+    }
+    opt := option.WithCredentialsFile("auto-305713-d012dfe6b1ac.json") 
+    app, err := firebase.NewApp(ctx, conf, opt)
+    if err != nil {
+        return []GeminiChat{{Parts:[]string{},Role:""},} , err
+    }
+    client, err := app.Database(ctx)
+    if err != nil {
+        return []GeminiChat{{Parts:[]string{},Role:""},} , err
+    }
+    path := "LineID" + "/" + id
+    ref := client.NewRef(path)
+    var InMemory []GeminiChat
+    if err := ref.Get(ctx, &InMemory); err != nil {
+        return []GeminiChat{{Parts:[]string{},Role:""},}, err
+    }
+    return InMemory ,nil
+}
+
+func addToHistory(history []*genai.Content,user string,model string,id string) error{
+	ctx := context.Background()
+	conf := &firebase.Config{
+        DatabaseURL: "Realtime Database URL",  // \Realtime Database URL
+    }
+    opt := option.WithCredentialsFile("your CredentialsFile") 
+    app, err := firebase.NewApp(ctx, conf, opt)
+    if err != nil {
+        log.Fatalf("error initializing app: %v\n", err)
+    }
+    client, err := app.Database(ctx)
+    if err != nil {
+        return  err
+    }
+    path := "LineID" + "/" + id
+    ref := client.NewRef(path)
+    // Save the conversation to the memory
+	history = append(history, &genai.Content{
+		Parts: []genai.Part{
+			genai.Text(user),
+		},
+		Role: "user",
+	})
+	// Save the response to the memory
+	history = append(history, &genai.Content{
+		Parts: []genai.Part{
+			genai.Text(model),
+		},
+		Role: "model",
+	})
+	if err := ref.Set(ctx, history); err != nil {
+        return  err
+    }
+    return nil
+
+} 
