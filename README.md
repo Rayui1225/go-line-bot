@@ -46,5 +46,6 @@ This image depicts a European Goldfinch (scientific name: Carduelis carduelis).
 They are a species of songbird in the finch family, native to Europe, North Africa, and Central Asia.  
 They are popular as caged birds due to their beautiful singing and easy care.  
 
-## doing  
 Integrate Firebase to give the Line bot memory capabilities.
+![image](https://github.com/Rayui1225/go-line-bot/assets/49279418/1dadeb8a-e287-4099-bb69-5bc672c44580)
+
